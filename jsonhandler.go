@@ -6,7 +6,7 @@ import (
 )
 
 type JsonHandler struct{
-	DTHandler
+	DTreeHandler
 }
 
 func (tree *JsonHandler) Decode() (err error) {

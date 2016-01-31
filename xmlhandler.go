@@ -7,7 +7,7 @@ import (
 )
 
 type XMLHandler struct{
-	DTHandler
+	DTreeHandler
 }
 
 

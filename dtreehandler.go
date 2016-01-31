@@ -7,16 +7,16 @@ import (
 	"strings"
 )
 
-type DTHandler struct{
+type DTreeHandler struct{
 	DTree
 	DirName string
 	FileName string
 	FileContent []byte
 }
 
-func (handler *DTHandler) SetFileName(fullName string) (err error) {
+func (handler *DTreeHandler) SetFileName(fullName string) (err error) {
 	if fullName = strings.Trim(fullName, " "); fullName == "" {
-		err = fmt.Errorf("DTHandler.SetFileName.fullName is empty!")
+		err = fmt.Errorf("DTreeHandler.SetFileName.fullName is empty!")
 		return
 	}
 	dir, _ := filepath.Split(fullName)
@@ -25,25 +25,25 @@ func (handler *DTHandler) SetFileName(fullName string) (err error) {
 	return
 }
 
-func (handler *DTHandler) ReadBytes(bytes []byte) (err error) {
+func (handler *DTreeHandler) ReadBytes(bytes []byte) (err error) {
 	if len(bytes) < 1 {
-		err = fmt.Errorf("DTHandler.ReadBytes.bytes is empty!")
+		err = fmt.Errorf("DTreeHandler.ReadBytes.bytes is empty!")
 		return
 	}
 	handler.FileContent = bytes
 	return
 }
 
-func (handler *DTHandler) ReadFile() (err error) {
+func (handler *DTreeHandler) ReadFile() (err error) {
 	if handler.FileName == "" {
-		err = fmt.Errorf("DTHandler.FileName is empty!")
+		err = fmt.Errorf("DTreeHandler.FileName is empty!")
 		return
 	}
 	handler.FileContent, err = ioutil.ReadFile(handler.FileName)
 	return
 }
 
-func (handler *DTHandler) WriteFile() (err error) {
+func (handler *DTreeHandler) WriteFile() (err error) {
 	err = fmt.Errorf("Not implemented")
 	return
 }
