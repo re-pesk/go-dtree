@@ -5,13 +5,38 @@ import (
 	"strings"
 )
 
+type I_Node interface{
+	GetValue(string) (string, interface{}, error)
+	SetValue(string, interface{}) (string, interface{}, error)
+	UpdateValue(string, interface{}) (string, interface{}, error)
+	AddValue(string, interface{}) (string, interface{}, error)
+}
+
+type I_DTreeHandler interface{
+	I_Node
+	Get(string) (string, interface{}, error)
+	Set(string, interface{}) (string, interface{}, error)
+	Update(string, interface{}) (string, interface{}, error)
+	Add(string, interface{}) (string, interface{}, error)
+ 	SetFileName(string) error
+	ReadBytes([]byte) error
+	ReadFile(string) error
+	WriteFile(string) error
+	Decode() error
+}
+
 func ProcessPath(path string) (firstKey string, restPath string, err error) {
 	path = strings.Trim(path, " ")
+	if path == "" {
+		err = fmt.Errorf("Path cannot be empty!")
+		return
+	} 
 	splitedPath := strings.SplitN(path, ".", 2)
 	splitedPathLen := len(splitedPath)
 	if splitedPathLen < 1 {
 		err = fmt.Errorf("Path is wrong!")
 		restPath = path
+		return
 	}
 	firstKey = strings.Trim(splitedPath[0], " ")
 	if splitedPathLen > 1 {
@@ -19,4 +44,3 @@ func ProcessPath(path string) (firstKey string, restPath string, err error) {
 	}
 	return
 }
-

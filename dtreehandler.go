@@ -7,13 +7,57 @@ import (
 	"strings"
 )
 
+const BREAKPOINT = ""
+
 type DTreeHandler struct{
 	DTree
 	DirName string
 	FileName string
 	FileContent []byte
+	Decode func() error
 }
 
+/* func (tree *DTree) Get(path string) (restPath string, value interface{}, err error){
+	restPath, value, err = tree.GetValue(path)
+	return
+}
+
+func (tree *DTree) Set(path string, newValue interface{}) (restPath string, value interface{}, err error){
+	restPath, value, err = tree.SetValue(path, newValue)
+	return
+}
+
+func (tree *DTree) Update(path string, newValue interface{}) (restPath string, value interface{}, err error){
+	restPath, value, err = tree.UpdateValue(path, newValue)
+	return
+}
+
+func (tree *DTree) Add(path string, newValue interface{}) (restPath string, value interface{}, err error){
+	restPath, value, err = tree.AddValue(path, newValue)
+	return
+}
+ */
+ 
+func (tree *DTreeHandler) Get(path string) (restPath string, value interface{}, err error){
+	restPath, value, err = tree.GetValue(path)
+	return
+}
+
+func (tree *DTreeHandler) Set(path string, newValue interface{}) (restPath string, value interface{}, err error){
+	restPath, value, err = tree.SetValue(path, newValue)
+	return
+}
+
+func (tree *DTreeHandler) Update(path string, newValue interface{}) (restPath string, value interface{}, err error){
+	restPath, value, err = tree.UpdateValue(path, newValue)
+	return
+}
+
+func (tree *DTreeHandler) Add(path string, newValue interface{}) (restPath string, value interface{}, err error){
+	restPath, value, err = tree.AddValue(path, newValue)
+	return
+}
+ 
 func (handler *DTreeHandler) SetFileName(fullName string) (err error) {
 	if fullName = strings.Trim(fullName, " "); fullName == "" {
 		err = fmt.Errorf("DTreeHandler.SetFileName.fullName is empty!")
@@ -34,8 +78,9 @@ func (handler *DTreeHandler) ReadBytes(bytes []byte) (err error) {
 	return
 }
 
-func (handler *DTreeHandler) ReadFile() (err error) {
-	if handler.FileName == "" {
+func (handler *DTreeHandler) ReadFile(fullName string) (err error) {
+	err = handler.SetFileName(fullName)
+	if err != nil || handler.FileName == "" {
 		err = fmt.Errorf("DTreeHandler.FileName is empty!")
 		return
 	}
@@ -43,7 +88,7 @@ func (handler *DTreeHandler) ReadFile() (err error) {
 	return
 }
 
-func (handler *DTreeHandler) WriteFile() (err error) {
+func (handler *DTreeHandler) WriteFile(fullName string) (err error) {
 	err = fmt.Errorf("Not implemented")
 	return
 }
