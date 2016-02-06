@@ -8,7 +8,7 @@ type DMap struct {
 	Value map[string]interface{}
 }
 
-func (tree *DMap) GetValue(path string) (restPath string, value interface{}, err error){
+func (tree *DMap) Get(path string) (restPath string, value interface{}, err error){
 	var firstKey string
 	firstKey, restPath, err = ProcessPath(path)
 	if err != nil{
@@ -19,7 +19,7 @@ func (tree *DMap) GetValue(path string) (restPath string, value interface{}, err
 	if succ {
 		if restPath != "" {
 			temp := DTree{value}
-			restPath, value, err = temp.GetValue(restPath)
+			restPath, value, err = temp.Get(restPath)
 		}
 	} else {
 		restPath = path
@@ -28,7 +28,7 @@ func (tree *DMap) GetValue(path string) (restPath string, value interface{}, err
 	return
 }
 
-func (tree *DMap) SetValue(path string, newValue interface{}) (restPath string, value interface{}, err error){
+func (tree *DMap) Set(path string, newValue interface{}) (restPath string, value interface{}, err error){
 	var firstKey string
 	firstKey, restPath, err = ProcessPath(path)
 /* 	if firstKey == "+" {
@@ -42,12 +42,12 @@ func (tree *DMap) SetValue(path string, newValue interface{}) (restPath string, 
 		tree.Value[firstKey] = newValue
 		value = tree.Value[firstKey]
 	} else {
-		_, _, err = tree.GetValue(firstKey)
+		_, _, err = tree.Get(firstKey)
 		if err != nil {
 			tree.Value[firstKey] = nil
 		}
 		temp := DTree{tree.Value[firstKey]}
-		restPath, value, err = temp.SetValue(restPath, newValue)
+		restPath, value, err = temp.Set(restPath, newValue)
 		tree.Value[firstKey] = temp.Value
 	}
 	return
@@ -56,7 +56,7 @@ func (tree *DMap) SetValue(path string, newValue interface{}) (restPath string, 
 
 
 
-func (tree *DMap) UpdateValue(path string, newValue interface{}) (restPath string, value interface{}, err error){
+func (tree *DMap) Update(path string, newValue interface{}) (restPath string, value interface{}, err error){
 	if path == "" {
 		err = fmt.Errorf("Map cannot have value with key \"\"!")
 		restPath = path
@@ -64,7 +64,7 @@ func (tree *DMap) UpdateValue(path string, newValue interface{}) (restPath strin
 	}
 	var firstKey string
 	firstKey, restPath, err = ProcessPath(path)
-	_, _, err = tree.GetValue(firstKey)
+	_, _, err = tree.Get(firstKey)
 	if err != nil {
 		restPath = path
 		return
@@ -74,14 +74,14 @@ func (tree *DMap) UpdateValue(path string, newValue interface{}) (restPath strin
 		value = tree.Value[firstKey]
 	} else {
 		temp := DTree{tree.Value[firstKey]}
-		restPath, value, err = temp.UpdateValue(restPath, newValue)
+		restPath, value, err = temp.Update(restPath, newValue)
 	}
 	return
 }
 
 
 
-func (tree *DMap) AddValue(path string, newValue interface{}) (restPath string, value interface{}, err error){
+func (tree *DMap) Add(path string, newValue interface{}) (restPath string, value interface{}, err error){
 	if path == "" {
 		err = fmt.Errorf("Map cannot have value with key \"\"!")
 		restPath = path
@@ -89,7 +89,7 @@ func (tree *DMap) AddValue(path string, newValue interface{}) (restPath string, 
 	}
 	var firstKey string
 	firstKey, restPath, err = ProcessPath(path)
-	_, _, err = tree.GetValue(firstKey)
+	_, _, err = tree.Get(firstKey)
 	if restPath == "" {
 		if err == nil {
 			err = fmt.Errorf("Map already has value with key %s!", firstKey)
@@ -104,7 +104,7 @@ func (tree *DMap) AddValue(path string, newValue interface{}) (restPath string, 
 			value = tree.Value[firstKey]
 		}
 		temp := DTree{tree.Value[firstKey]}
-		restPath, value, err = temp.AddValue(restPath, newValue)
+		restPath, value, err = temp.Add(restPath, newValue)
 	}
 	return
 }
