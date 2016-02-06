@@ -17,3 +17,8 @@ func (tree *JsonHandler) Decode() (err error) {
 	err = json.Unmarshal(tree.FileContent, &tree.Value)
 	return
 }
+
+func (tree *JsonHandler) Encode() (err error) {
+	tree.FileContent, err = json.MarshalIndent(tree.Value, "", "\t")
+	return
+}
