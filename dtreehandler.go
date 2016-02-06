@@ -3,6 +3,7 @@ package datatree
 import (
 	"fmt"
 	"io/ioutil"
+//	"os"
 	"path/filepath"
 	"strings"
 )
@@ -14,50 +15,8 @@ type DTreeHandler struct{
 	DirName string
 	FileName string
 	FileContent []byte
-	Decode func() error
 }
 
-/* func (tree *DTree) Get(path string) (restPath string, value interface{}, err error){
-	restPath, value, err = tree.GetValue(path)
-	return
-}
-
-func (tree *DTree) Set(path string, newValue interface{}) (restPath string, value interface{}, err error){
-	restPath, value, err = tree.SetValue(path, newValue)
-	return
-}
-
-func (tree *DTree) Update(path string, newValue interface{}) (restPath string, value interface{}, err error){
-	restPath, value, err = tree.UpdateValue(path, newValue)
-	return
-}
-
-func (tree *DTree) Add(path string, newValue interface{}) (restPath string, value interface{}, err error){
-	restPath, value, err = tree.AddValue(path, newValue)
-	return
-}
- */
- 
-func (tree *DTreeHandler) Get(path string) (restPath string, value interface{}, err error){
-	restPath, value, err = tree.GetValue(path)
-	return
-}
-
-func (tree *DTreeHandler) Set(path string, newValue interface{}) (restPath string, value interface{}, err error){
-	restPath, value, err = tree.SetValue(path, newValue)
-	return
-}
-
-func (tree *DTreeHandler) Update(path string, newValue interface{}) (restPath string, value interface{}, err error){
-	restPath, value, err = tree.UpdateValue(path, newValue)
-	return
-}
-
-func (tree *DTreeHandler) Add(path string, newValue interface{}) (restPath string, value interface{}, err error){
-	restPath, value, err = tree.AddValue(path, newValue)
-	return
-}
- 
 func (handler *DTreeHandler) SetFileName(fullName string) (err error) {
 	if fullName = strings.Trim(fullName, " "); fullName == "" {
 		err = fmt.Errorf("DTreeHandler.SetFileName.fullName is empty!")
@@ -84,11 +43,17 @@ func (handler *DTreeHandler) ReadFile(fullName string) (err error) {
 		err = fmt.Errorf("DTreeHandler.FileName is empty!")
 		return
 	}
-	handler.FileContent, err = ioutil.ReadFile(handler.FileName)
+	if err == nil {
+		handler.FileContent, err = ioutil.ReadFile(handler.FileName)
+	}
 	return
 }
 
 func (handler *DTreeHandler) WriteFile(fullName string) (err error) {
-	err = fmt.Errorf("Not implemented")
+	if len(handler.FileContent) < 1 {
+		err = fmt.Errorf("DTreeHandler.FileContent is empty!")
+		return
+	}
+	err = ioutil.WriteFile(fullName, handler.FileContent, 0777)
 	return
 }
