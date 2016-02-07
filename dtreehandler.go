@@ -49,11 +49,28 @@ func (handler *DTreeHandler) ReadFile(fullName string) (err error) {
 	return
 }
 
-func (handler *DTreeHandler) WriteFile(fullName string) (err error) {
+func (handler *DTreeHandler) NewFile(fullName string) (err error) {
 	if len(handler.FileContent) < 1 {
 		err = fmt.Errorf("DTreeHandler.FileContent is empty!")
 		return
 	}
+	if fullName == "" {
+		err = fmt.Errorf("DTreeHandler.NewFile().fullName is empty!")
+		return
+	}
 	err = ioutil.WriteFile(fullName, handler.FileContent, 0777)
+	return
+}
+
+func (handler *DTreeHandler) WriteFile() (err error) {
+	if len(handler.FileContent) < 1 {
+		err = fmt.Errorf("DTreeHandler.FileContent is empty!")
+		return
+	}
+	if handler.FileName == "" {
+		err = fmt.Errorf("DTreeHandler.FileName is empty!")
+		return
+	}
+	err = ioutil.WriteFile(handler.FileName, handler.FileContent, 0777)
 	return
 }

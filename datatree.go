@@ -17,8 +17,10 @@ type I_DTreeHandler interface{
  	SetFileName(string) error
 	ReadBytes([]byte) error
 	ReadFile(string) error
-	WriteFile(string) error
+	WriteFile() error
+	NewFile(string) error
 	Decode() error
+	Encode() error
 }
 
 func ProcessPath(path string) (firstKey string, restPath string, err error) {
