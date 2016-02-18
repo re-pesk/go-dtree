@@ -1,4 +1,4 @@
-package datatree
+package dtree
 
 import (
 	"fmt"
@@ -9,16 +9,23 @@ type JsonHandler struct{
 	DTreeHandler
 }
 
-func (tree *JsonHandler) Decode() (err error) {
-	if len(tree.FileContent) == 0 {
+func (handler *JsonHandler) Decode() (err error) {
+	if len(handler.FileContent) == 0 {
 		err = fmt.Errorf("JsonHandler.FileContent is empty!")
 		return
 	}
-	err = json.Unmarshal(tree.FileContent, &tree.Value)
+	err = json.Unmarshal(handler.FileContent, &handler.Value)
+	if err != nil {
+		err = fmt.Errorf(
+			"JsonHandler.Decode(): json.Unmarshal() error decoding file \"%s\":\n\n  %s", 
+			handler.FileName, 
+			err.Error(),
+		)
+	}
 	return
 }
 
-func (tree *JsonHandler) Encode() (err error) {
-	tree.FileContent, err = json.MarshalIndent(tree.Value, "", "\t")
+func (handler *JsonHandler) Encode() (err error) {
+	handler.FileContent, err = json.MarshalIndent(handler.Value, "", "\t")
 	return
 }

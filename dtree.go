@@ -1,4 +1,4 @@
-package datatree
+package dtree
 
 import (
 	"fmt"
@@ -6,49 +6,52 @@ import (
 	"strings"
 )
 
+type NTree interface{}
+
 type DTree struct{
 	Value interface{}
+	RestPath string
+	Error error
 }
 
-func (tree *DTree) Get(path string) (restPath string, value interface{}, err error){
+func (tree *DTree) Get(path string) (result DTree) {
 	path = strings.Trim(path, " ") 
 	if path == "" {
-		value = tree.Value
+		result.Value = tree.Value
 		return
 	}
-	restPath = path
+	result.RestPath = path
 	switch typedVal := tree.Value.(type){
 	case map[string]interface{}:
 		temp := DMap{typedVal}
-		restPath, value, err = temp.Get(path)
+		result = temp.Get(path)
 	case []interface{}:
 		temp := DArray{typedVal}
-		restPath, value, err = temp.Get(path)
+		result = temp.Get(path)
 	default:
-		err = fmt.Errorf("Value of type \"%T\" has no index!", typedVal)
+		result.Error = fmt.Errorf("Value of type \"%T\" has no index!", typedVal)
 	}
 	return
 }
 
-func (tree *DTree) Set(path string, newValue interface{}) (restPath string, value interface{}, err error){
+func (tree *DTree) Set(path string, newValue interface{}) (result DTree){
 	path = strings.Trim(path, " ")
 	if path == "" {
 		tree.Value = newValue
-		value = tree.Value
+		result.Value = tree.Value
 		return
 	}
-	restPath = path
+	result.RestPath = path
 	var firstKey string
-	firstKey, _, err = ProcessPath(path)
+	firstKey, _, result.Error = ProcessPath(path)
 	switch tree.Value.(type){
-	case map[string]interface{}:
-	case []interface{}:
+	case map[string]interface{}, []interface{} :
 	default:
-		if err != nil {
+		if result.Error != nil {
 			return
 		}
-		_, err = strconv.Atoi(firstKey)
-		if err == nil || firstKey == "+" {
+		_, result.Error = strconv.Atoi(firstKey)
+		if result.Error == nil || firstKey == "+" {
 			tree.Value = []interface{}{}
 		} else {
 			tree.Value = map[string]interface{}{}
@@ -57,54 +60,54 @@ func (tree *DTree) Set(path string, newValue interface{}) (restPath string, valu
 	switch typedVal := tree.Value.(type){
 	case map[string]interface{}:
 		temp := DMap{typedVal}
-		restPath, value, err = temp.Set(path, newValue)
+		result = temp.Set(path, newValue)
 		tree.Value = temp.Value
 	case []interface{}:
 		temp := DArray{typedVal}
-		restPath, value, err = temp.Set(path, newValue)
+		result = temp.Set(path, newValue)
 		tree.Value = temp.Value
 	default:
-		err = fmt.Errorf("Value of type \"%T\" has no index!", typedVal)
+		result.Error = fmt.Errorf("Value of type \"%T\" has no index!", typedVal)
 	}
 	return
 }
 
-func (tree *DTree) Update(path string, newValue interface{}) (restPath string, value interface{}, err error){
+func (tree *DTree) Update(path string, newValue interface{}) (result DTree){
 	if path = strings.Trim(path, " "); path == "" {
 		tree.Value = newValue
-		value = tree.Value
+		result.Value = tree.Value
 		return
 	}
-	restPath = path
+	result.RestPath = path
 	switch typedVal := tree.Value.(type){
 	case map[string]interface{}:
 		temp := DMap{typedVal}
-		restPath, value, err = temp.Update(path, newValue)
+		result = temp.Update(path, newValue)
 	case []interface{}:
 		temp := DArray{typedVal}
-		restPath, value, err = temp.Update(path, newValue)
+		result = temp.Update(path, newValue)
 	default:
-		err = fmt.Errorf("Value of type \"%T\" has no index!", typedVal)
+		result.Error = fmt.Errorf("Value of type \"%T\" has no index!", typedVal)
 	}
 	return
 }
 
-func (tree *DTree) Add(path string, newValue interface{}) (restPath string, value interface{}, err error){
+func (tree *DTree) Add(path string, newValue interface{}) (result DTree){
 	if path = strings.Trim(path, " "); path == "" {
 		tree.Value = newValue
-		value = tree.Value
+		result.Value = tree.Value
 		return
 	}
-	restPath = path
+	result.RestPath = path
 	switch typedVal := tree.Value.(type){
 	case map[string]interface{}:
 		temp := DMap{typedVal}
-		restPath, value, err = temp.Add(path, newValue)
+		result = temp.Add(path, newValue)
 	case []interface{}:
 		temp := DArray{typedVal}
-		restPath, value, err = temp.Add(path, newValue)
+		result = temp.Add(path, newValue)
 	default:
-		err = fmt.Errorf("Value of type \"%T\" has no index!", typedVal)
+		result.Error = fmt.Errorf("Value of type \"%T\" has no index!", typedVal)
 	}
 	return
 }

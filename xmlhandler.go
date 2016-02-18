@@ -1,4 +1,4 @@
-package datatree
+package dtree
 
 import (
 	//"encoding/xml"

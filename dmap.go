@@ -1,53 +1,81 @@
-package datatree
+package dtree
 
 import (
 	"fmt"
 )
 
+type NMap map[string]interface{}
+
 type DMap struct {
 	Value map[string]interface{}
 }
 
-func (tree *DMap) Get(path string) (restPath string, value interface{}, err error){
+func (tree *DMap) Get(path string) (result DTree){
 	var firstKey string
-	firstKey, restPath, err = ProcessPath(path)
-	if err != nil{
-		restPath = path
+	firstKey, result.RestPath, result.Error = ProcessPath(path)
+	if result.Error != nil{
+		result.RestPath = path
 		return
 	}
-	value, succ := tree.Value[firstKey]
+	var succ bool ; result.Value, succ = tree.Value[firstKey]
 	if succ {
-		if restPath != "" {
-			temp := DTree{value}
-			restPath, value, err = temp.Get(restPath)
+		if result.RestPath != "" {
+			result = result.Get(result.RestPath)
 		}
 	} else {
-		restPath = path
-		err = fmt.Errorf("Map has no element with key \"%s\"!", firstKey)
+		result.RestPath = path
+		result.Error = fmt.Errorf("Map has no element with key \"%s\"!", firstKey)
 	}
 	return
 }
 
-func (tree *DMap) Set(path string, newValue interface{}) (restPath string, value interface{}, err error){
+func (tree *DMap) Set(path string, newValue interface{}) (result DTree){
 	var firstKey string
-	firstKey, restPath, err = ProcessPath(path)
-/* 	if firstKey == "+" {
-		err = fmt.Errorf("Map key \"+\" is wrong!")
-	}
- */	if err != nil {
-		restPath = path
+	firstKey, result.RestPath, result.Error = ProcessPath(path)
+	if result.Error != nil {
+		result.RestPath = path
 		return
 	}
-	if restPath == "" {
-		tree.Value[firstKey] = newValue
-		value = tree.Value[firstKey]
+	if result.RestPath == "" {
+		result.Value = newValue
+		tree.Value[firstKey] = result.Value
 	} else {
-		_, _, err = tree.Get(firstKey)
-		if err != nil {
+		result.Error = tree.Get(firstKey).Error
+		if result.Error != nil {
 			tree.Value[firstKey] = nil
 		}
-		temp := DTree{tree.Value[firstKey]}
-		restPath, value, err = temp.Set(restPath, newValue)
+		var temp DTree
+		temp.Value = tree.Value[firstKey]
+		result = temp.Set(result.RestPath, newValue)
+		tree.Value[firstKey] = temp.Value
+
+	}
+	return
+}
+
+
+
+
+func (tree *DMap) Update(path string, newValue interface{}) (result DTree){
+	if path == "" {
+		result.Error = fmt.Errorf("Map cannot have value with key \"\"!")
+		result.RestPath = path
+		return
+	}
+	var firstKey string
+	firstKey, result.RestPath, result.Error = ProcessPath(path)
+	result.Error = tree.Get(firstKey).Error
+	if result.Error != nil {
+		result.RestPath = path
+		return
+	}
+	if result.RestPath == "" {
+		result.Value = newValue
+		tree.Value[firstKey] = result.Value
+	} else {
+		var temp DTree
+		temp.Value = tree.Value[firstKey]
+		result = temp.Update(result.RestPath, newValue)
 		tree.Value[firstKey] = temp.Value
 	}
 	return
@@ -55,56 +83,31 @@ func (tree *DMap) Set(path string, newValue interface{}) (restPath string, value
 
 
 
-
-func (tree *DMap) Update(path string, newValue interface{}) (restPath string, value interface{}, err error){
+func (tree *DMap) Add(path string, newValue interface{}) (result DTree){
 	if path == "" {
-		err = fmt.Errorf("Map cannot have value with key \"\"!")
-		restPath = path
+		result.Error = fmt.Errorf("Map cannot have value with key \"\"!")
+		result.RestPath = path
 		return
 	}
 	var firstKey string
-	firstKey, restPath, err = ProcessPath(path)
-	_, _, err = tree.Get(firstKey)
-	if err != nil {
-		restPath = path
-		return
-	}
-	if restPath == "" {
-		tree.Value[firstKey] = newValue
-		value = tree.Value[firstKey]
-	} else {
-		temp := DTree{tree.Value[firstKey]}
-		restPath, value, err = temp.Update(restPath, newValue)
-	}
-	return
-}
-
-
-
-func (tree *DMap) Add(path string, newValue interface{}) (restPath string, value interface{}, err error){
-	if path == "" {
-		err = fmt.Errorf("Map cannot have value with key \"\"!")
-		restPath = path
-		return
-	}
-	var firstKey string
-	firstKey, restPath, err = ProcessPath(path)
-	_, _, err = tree.Get(firstKey)
-	if restPath == "" {
-		if err == nil {
-			err = fmt.Errorf("Map already has value with key %s!", firstKey)
-			restPath = path
+	firstKey, result.RestPath, result.Error = ProcessPath(path)
+	result.Error = tree.Get(firstKey).Error
+	if result.RestPath == "" {
+		if result.Error == nil {
+			result.Error = fmt.Errorf("Map already has value with key %s!", firstKey)
+			result.RestPath = path
 			return
 		}
-		tree.Value[firstKey] = newValue
-		value = tree.Value[firstKey]
+		result.Value = newValue
+		tree.Value[firstKey] = result.Value
 	} else {
-		if err != nil {
+		if result.Error != nil {
 			tree.Value[firstKey] = nil
-			value = tree.Value[firstKey]
 		}
-		temp := DTree{tree.Value[firstKey]}
-		restPath, value, err = temp.Add(restPath, newValue)
+		var temp DTree
+		temp.Value = tree.Value[firstKey]
+		result = temp.Add(result.RestPath, newValue)
+		tree.Value[firstKey] = temp.Value
 	}
 	return
 }
