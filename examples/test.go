@@ -2,7 +2,7 @@ package main
 
 import (
 	"dtree"
-	"output"
+	"github.com/re-pe/output"
 	"log"
 	"os"
 	"strconv"
