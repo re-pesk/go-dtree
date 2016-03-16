@@ -29,12 +29,12 @@ type I_DTreeHandler interface{
 	Encode() error
 }
 
-type IntResult struct {
+type intResult struct {
 	Index int
 	Error error
 }
 
-func PathExists(path string, dir bool) (result IntResult) {
+func pathExists(path string, dir bool) (result intResult) {
 	result.Index = -1
 	path = strings.TrimSpace(path)
 	if path == "" {

@@ -43,7 +43,7 @@ func (handler *DTreeHandler) ReadFile(fullName string) (err error) {
 		err = fmt.Errorf("DTreeHandler.FileName is empty!")
 		return
 	}
-	if PathExists(handler.FileName, isFile).Index < 2 {
+	if pathExists(handler.FileName, isFile).Index < 2 {
 		err = fmt.Errorf("File %s does not exist!", handler.FileName)
 		return
 	}
