@@ -1,4 +1,4 @@
 /.project
-.log
-.bat
-.lnk
+*.log
+*.bat
+*.lnk
