@@ -1,0 +1,5 @@
+<root>
+	<Arr>a</Arr>
+	<Map><a>0</a><b>1</b><c>2</c><i0>3</i0></Map>
+	<Arr>b</Arr><Arr>c</Arr><Arr>0</Arr><Arr>1</Arr><Arr>2</Arr>
+</root>
