@@ -10,6 +10,7 @@ type NTree interface{}
 
 type DTree struct{
 	Value interface{}
+	UsedPath string
 	RestPath string
 	Error error
 }
@@ -73,42 +74,24 @@ func (tree *DTree) Set(path string, newValue interface{}) (result DTree){
 }
 
 func (tree *DTree) Update(path string, newValue interface{}) (result DTree){
-	if path = strings.Trim(path, " "); path == "" {
-		tree.Value = newValue
-		result.Value = tree.Value
-		return
-	}
-	result.RestPath = path
-	switch typedVal := tree.Value.(type){
-	case map[string]interface{}:
-		temp := DMap{typedVal}
-		result = temp.Update(path, newValue)
-	case []interface{}:
-		temp := DArray{typedVal}
-		result = temp.Update(path, newValue)
-	default:
-		result.Error = fmt.Errorf("Value of type \"%T\" has no index!", typedVal)
+	path = strings.Trim(path, " ")
+	tmp := tree.Get(path)
+	if tmp.Error == nil {
+		result = tree.Set(path, newValue)
+	} else {
+		result.Error = fmt.Errorf("Element with key \"%v\" doesn't exist!", path)
 	}
 	return
 }
 
 func (tree *DTree) Add(path string, newValue interface{}) (result DTree){
-	if path = strings.Trim(path, " "); path == "" {
-		tree.Value = newValue
-		result.Value = tree.Value
-		return
-	}
-	result.RestPath = path
-	switch typedVal := tree.Value.(type){
-	case map[string]interface{}:
-		temp := DMap{typedVal}
-		result = temp.Add(path, newValue)
-	case []interface{}:
-		temp := DArray{typedVal}
-		result = temp.Add(path, newValue)
-	default:
-		result.Error = fmt.Errorf("Value of type \"%T\" has no index!", typedVal)
+	path = strings.Trim(path, " ")
+	tmp := tree.Get(path)
+	if tmp.Error != nil {
+		result = tree.Set(path, newValue)
+	} else {
+		result.UsedPath = path
+		result.Error = fmt.Errorf("Element with key \"%v\" already exists!", path)
 	}
 	return
 }
-

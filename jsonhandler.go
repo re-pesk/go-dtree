@@ -29,3 +29,11 @@ func (handler *JsonHandler) Encode() (err error) {
 	handler.FileContent, err = json.MarshalIndent(handler.Value, "", "\t")
 	return
 }
+
+func (handler *JsonHandler) ToValue(jsonString string) (result interface{}){
+	err := json.Unmarshal([]byte(jsonString), &result)
+	if err != nil && jsonString != "" {
+		panic(err)
+	}
+	return
+}

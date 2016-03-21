@@ -8,8 +8,6 @@ import (
 	"strings"
 )
 
-const BREAKPOINT = ""
-
 type DTreeHandler struct{
 	DTree
 	DirName string

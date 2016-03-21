@@ -7,6 +7,7 @@ import (
 )
 
 const (
+	BREAKPOINT        = "breakpoint" //breakoint for modified godebug
 	isDir             = true
 	isFile            = false
 )
@@ -85,3 +86,4 @@ func ProcessPath(path string) (firstKey string, restPath string, err error) {
 	}
 	return
 }
+
