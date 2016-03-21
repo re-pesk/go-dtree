@@ -1,7 +1,7 @@
 package main
 
 import (
-	. "dtree"
+	. "github.com/re-pe/dtree"
 	. "github.com/re-pe/output"
 	"encoding/json"
 	"fmt"
@@ -171,7 +171,7 @@ _ = BREAKPOINT
 	return
 }
 
-func TestAdd(testList *TestList, tree I_DTreeHandler, testLen int) {
+/* func TestAdd(testList *TestList, tree I_DTreeHandler, testLen int) {
 	Debug("FY.B?:Begin function", "TestAdd()")
 	for no, test := range (*testList)[:] {
 		if testLen > -1 && no >= testLen {
@@ -189,7 +189,8 @@ _ = BREAKPOINT
 	Debug("End function", "TestAdd()")
 	return
 }
-
+*/
+ 
 func main(){
 	args := os.Args
 	for _, arg := range args {

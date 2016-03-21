@@ -15,8 +15,8 @@ const (
 type I_Node interface{
 	Get(string) DTree
 	Set(string, interface{}) DTree
-	Update(string, interface{}) DTree
-	Add(string, interface{}) DTree
+	//Update(string, interface{}) DTree
+	//Add(string, interface{}) DTree
 }
 
 type I_DTreeHandler interface{
