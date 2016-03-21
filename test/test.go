@@ -1,300 +1,332 @@
 package main
 
 import (
-	"dtree"
-	"github.com/re-pe/output"
+	. "dtree"
+	. "github.com/re-pe/output"
+	"encoding/json"
+	"fmt"
 	"log"
 	"os"
-	"strconv"
+	"reflect"
 )
 
 const (
-	BREAKPOINT     = "breakpoint"
+	//BREAKPOINT     = "breakpoint" // BREAKPOINT for modified godebug github.com/re-pe/godebug
 
 	tmpDirName      = "_tmp/"
 	logDirName      = tmpDirName + "log/"
-	logFileName     = logDirName + "_settings.log"
-
-	keyConfFileName = "ConfFile"
-	keyConfDirName  = "ConfDir"
+	runFileName     = "test.go"
+	logFileExt      = ".log"
 
 	confName        = "start.conf"
 	xmlName         = "start.xml"
-	breakNo         = 100
+	testLen         = -1
+)
+
+const (
+	errMap    = "?:Map has no element with key \"%v\"!"
+	errArr    = "?:Index \"%v\" is out of range of the array!"
+	errVal    = "?:Value of type \"%s\" has no index!"
+	errAlr    = "?:Element with key \"%s\" already exists!"
 )
 
 var (
-	flagDebug   bool
-	flagVerbose bool
+	flags Flags
+	logFileName string
 )
 
-func Out(selector string, args ...interface{}){
-	output.Out(selector, args...)
+type Value interface{}
+
+type Expected struct{
+	Value    Value
+	UsedPath string
+	RestPath string
+	Error    error
 }
 
-func OutDeb(selector string, args ...interface{}){
-	selector = "R.20." + selector + output.Env.GetPreColor(selector)
-	//output.Out("lPr."+selector, args...)
-	output.Out("fPr." + selector, args...)
+type Test struct{
+	Key      string
+	NewValue Value
+	Expected Expected
+	Result   DTree
 }
 
-func OutAll(selector string, args ...interface{}){
-	output.Out("lPr." + selector, args...)
-	output.Out("fPr." + selector, args...)
-}
-
-func OutLog(selector string, args ...interface{}){
-	output.Out("lPr."+selector, args...)
-}
-
-func OutScr(selector string, args ...interface{}){
-	output.Out("fPr."+selector, args...)
-}
+type TestList []Test
 
 type Index []interface{} 
 type Indices []Index
 
 
-type FinalValue dtree.DTree
+type FinalValue DTree
 
-type FinalValueMap map[string]dtree.DTree
+type FinalValueMap map[string]DTree
 
-//func CollectFinalValues(indices *Indices, tree *dtree.DTreeHandler /* *dtree.JsonHandler*/, breakNo int) (finalValues FinalValueMap) {
-func CollectFinalValues(indices *Indices, tree dtree.I_DTreeHandler, breakNo int) (finalValues FinalValueMap) {
-	OutDeb("BeginLoop", "CollectFinalValues()")
-//	tree := *treePtr
-	OutDeb("Out", "indices:"); OutScr("R.20.?F:%v", indices)
-	OutScr("B.00.Out.FgYellow.Bold", "Indices are:\n        no.           index\n-----------------------------------------------------------------------"); 
-	finalValues = FinalValueMap{}
-	for no, index := range *indices {
-		if breakNo > -1 && no > breakNo {
-			break
-		}
-		strKey := index[0].(string)
-		OutScr("S.00.?F:%10d. %15s\n", no, strKey)
-
-//_ = BREAKPOINT
-		var result dtree.DTree
-		switch len(index){
-		case 1 :
-			result = tree.Get(strKey)
-		case 2 : 
-			result = tree.Update(strKey, index[1])
-		}
-		if result.Error == nil {
-			OutScr("S.22.?F:tree.Get(\"%s\") ==\n\n", strKey); OutScr("R.22.?F:%v\n", result.Value)
-		} else {
-			OutScr("S.22.?F:Error!!! Result of tree.Get(\"%s\") is ", strKey)
-			OutScr("S.22.?F:%v ", result.Value); OutScr("S.22.?F:%v", result.RestPath)
-			OutScr("R.22.?F:.%v", result.Error.Error())
-		}
-		OutScr("R.22")
-		finalValues[strKey] = result
+func JValue(jsonString string) (result Value){
+	err := json.Unmarshal([]byte(jsonString), &result)
+	if err != nil && jsonString != "" {
+		panic(err)
 	}
-	OutDeb("EndLoop", "CollectFinalValues()")
 	return
 }
 
-func PrintFinalValues(indices *Indices, finalValueMap *FinalValueMap, breakNo int){
-	OutDeb("B.00.Out.FgYellow.Bold", "Values for indices are:\n        no.            path = result.Value\n        no.            path = --  Wrong path : rest path  Error : error\n-----------------------------------------------------------------------")
-	OutDeb("BeginLoop", "valLoop")
-	finalValues := *finalValueMap
-	for no, index := range *indices {
-		if breakNo > -1 && no > breakNo {
+func Error(args ...interface{}) (err error){
+	err = fmt.Errorf(Format(args...))
+	return
+}
+
+func OutputTest(testList *TestList, testLen int){
+	Out(`FY.B?:
+                 no. key = test.Key
+				 
+               new value = test.NewValue
+			   
+          expected value = test.Expected.Value
+          returned Value = test.Result.Value
+                                                            test summary 
+      expected used path = test.Expected.UsedPath
+      returned used path = test.Result.UsedPath
+                                                            test summary 
+      expected rest path = test.Expected.RestPath
+      returned rest path = test.Result.RestPath
+                                                            test summary 
+          expected error = test.Expected.Error
+          returned error = test.Result.Error
+                                                            test summary 
+-----------------------------------------------------------------------
+`)
+	for no, test := range (*testList)[:] {
+		if testLen > -1 && no >= testLen {
 			break
 		}
-		strKey := index[0].(string)
-		if intKey, cnvErr := strconv.Atoi(strKey); cnvErr == nil {
-			OutScr("S.00.?F:%10d. %15d = ", no, intKey)
+		Out("FHY.B?:%24s = \"%v\"\n", Format("?:%3d. %s", no, "key"), test.Key)
+		Out("\n")
+		Out("?:%24s = %v\n"    , "new value"         , test.NewValue)
+		Out("\n")
+		Out("?:%24s = %v\n"    , "expected value"    , test.Expected.Value)
+		Out("?:%24s = %v\n"    , "returned Value"    , test.Result.Value)
+		if eq := reflect.DeepEqual(test.Expected.Value, test.Result.Value); eq {
+			Out("FHC.B?: %80s \n", "Values are equal. Test is passed.")
 		} else {
-			OutScr("S.00.?F:%10d. %15s = ", no, "\"" + strKey + "\"")
+			Out("FHR.B?: %80s \n", "Values are not equal. Test is failed.")
 		}
-		if finalValues[strKey].Error == nil {
-			OutScr("S.00.?F:%v", finalValues[strKey].Value)
+		Out("?:%24s = \"%v\"\n", "expected used path", test.Expected.UsedPath)
+		Out("?:%24s = \"%v\"\n", "returned used path", test.Result.UsedPath)
+		if eq := reflect.DeepEqual(test.Expected.UsedPath, test.Result.UsedPath); eq {
+			Out("FHC.B?: %80s \n", "UsedPaths are equal. Test is passed.")
 		} else {
-			OutScr("S.00.?F:--  ")
+			Out("FHR.B?: %80s \n", "UsedPaths are not equal. Test is failed.")
 		}
-		if(len(finalValues[strKey].RestPath) > 0){
-			OutScr("S.00.?F:Wrong path : %-10s", finalValues[strKey].RestPath); OutScr("R.00.?F: Error : %v", finalValues[strKey].Error)
+		Out("?:%24s = \"%v\"\n", "expected rest path", test.Expected.RestPath)
+		Out("?:%24s = \"%v\"\n", "returned rest path", test.Result.RestPath)
+		if eq := reflect.DeepEqual(test.Expected.RestPath, test.Result.RestPath); eq {
+			Out("FHC.B?: %80s \n", "RestPaths are equal. Test is passed.")
 		} else {
-			OutScr("R.00")
+			Out("FHR.B?: %80s \n", "RestPaths are not equal. Test is failed.")
 		}
+		Out("?:%24s = %v\n"    , "expected error"    , test.Expected.Error)
+		Out("?:%24s = %v\n"    , "returned error"    , test.Result.Error)
+		if eq := reflect.DeepEqual(test.Expected.Error, test.Result.Error); eq {
+			Out("FHC.B?: %80s \n", "Errors are equal. Test is passed.")
+		} else {
+			Out("FHR.B?: %80s \n", "Errors are not equal. Test is failed.")
+		}
+		Out("\n")
 	}
-	OutDeb("EndLoop", "valLoop")
+}
+
+func TestGet(testList *TestList, tree I_DTreeHandler, testLen int) {
+	Debug("FY.B?:Begin function", "TestGet()")
+	for no, test := range (*testList)[:] {
+		if testLen > -1 && no >= testLen {
+			break
+		}
+_ = BREAKPOINT
+		result := tree.Get(test.Key)
+		(*testList)[no].Result = result
+	}
+	Out(`FY.B?:-----------------------------------------------------------------------
+ Fields of testing results of DTree.Get():
+`   )
+	OutputTest(testList, testLen)
+	Debug("End fnction", "TestGet()")
+	return
+}
+
+func TestSet(testList *TestList, tree I_DTreeHandler, testLen int) {
+	Debug("FY.B?:Begin function", "TestSet()")
+	for no, test := range (*testList)[:] {
+		if testLen > -1 && no >= testLen {
+			break
+		}
+_ = BREAKPOINT
+		result := tree.Set(test.Key, test.NewValue)
+		(*testList)[no].Result = result
+	}
+
+	Out(`FY.B?:-----------------------------------------------------------------------
+ Fields of testing results of DTree.Set():
+`   )
+	OutputTest(testList, testLen)
+	Debug("End function", "TestSet()")
+	return
+}
+
+func TestAdd(testList *TestList, tree I_DTreeHandler, testLen int) {
+	Debug("FY.B?:Begin function", "TestAdd()")
+	for no, test := range (*testList)[:] {
+		if testLen > -1 && no >= testLen {
+			break
+		}
+_ = BREAKPOINT
+		result := tree.Add(test.Key, test.NewValue)
+		(*testList)[no].Result = result
+	}
+
+	Out(`FY.B?:-----------------------------------------------------------------------
+ Fields of testing results of DTree.Add():
+`   )
+	OutputTest(testList, testLen)
+	Debug("End function", "TestAdd()")
 	return
 }
 
 func main(){
-	flagDebug = false
-	flagVerbose = false
 	args := os.Args
-	for _, b := range args {
-        if b == "--debug" {
-            flagDebug = true
+	for _, arg := range args {
+        switch arg {
+		case "--debug" :
+            flags.Debug = true
+		case "--verbose" :
+			flags.Verbose = true
         }
-		if b == "--verbose" {
-			flagVerbose = true
-		}
     }
-//_ = BREAKPOINT
-	output.Env.Init("_tmp/log/_settings.log", flagDebug, flagVerbose, output.States)
-	defer output.Env.LogFile.Close()
-	log.SetOutput(output.Env.LogFile)
-	OutScr("R.00", "")
-	OutDeb("BeginProg", "_Settings")
-	//var result.RestPath string
-	//var value interface{}
-	OutAll("B.00.FgCyan.Bold.?F: JSON test\n-----------")
-	var appConf dtree.JsonHandler
+
+	OuputInit(&flags)
 	
-/*  ltrenatyva - funkcijos priskyrimas	
-	appConf := dtree.DTreeHandler{}
-	appConf.Decode = func() (err error) {
-		tree := &appConf
-		if len((*tree).FileContent) == 0 {
-			err = fmt.Errorf("DTreeHandler.FileContent is empty!")
-			return
-		}
-		err = json.Unmarshal((*tree).FileContent, &(*tree).Value)
-		return
-	}
-*/
+// logfailo sukūrimas
+	logFile, err := NewLogFile(logDirName, runFileName, logFileExt)
+	if err != nil { return }
+	logFileInfo, err := logFile.Stat()
+	if err != nil { return }
+	logFileName = logFileInfo.Name()
+	defer logFile.Close()
+	log.SetOutput(logFile)
+
+	Out("\n File ", runFileName, " is running.\n\n")
+
+	Out("FHM.B?: JSON test\n-----------\n\n")
+
+	// json'o skaitymo įrankio sukūrimas
+	var appConf JsonHandler
 	
-	var err error
 	if err = appConf.ReadFile(confName); err != nil {
 		panic(err)
 	}
-	OutAll("R.00.?F: File \"%v\" exists and was read.\n", appConf.FileName)
+	Out("?: File \"%v\" exists and was read.\n\n", appConf.FileName)
 	if err = appConf.Decode(); err != nil {
 		panic(err)
 	}
-	OutAll("R.00.?F: A structure with data tree of \"%v\" file was successfully created.\n", appConf.FileName)
-	OutAll("R.20.Out", "Content of the structure is:\n\n                           key : value\n---------------------------------------------------------\n" )
+	Out("?: A structure with data tree of \"%v\" file was successfully created.\n\n", appConf.FileName)
+
+	Out("FY.B?: appConf.Value is:\n");  Out(appConf.Value, "\n\n")
+
+	// Preparing list of DTree.Get() tests
+	// []Test{ 
+	//     key, new value(nil), 
+	//     Expected { expected value, expected used path, expected rest path, expected error },
+	//     result
+	// }
 	
-//_ = BREAKPOINT
-  	switch typedValue := appConf.Value.(type){
-	case map[string]interface{}:
-		for i, u := range typedValue {
-			OutScr("S.20.?F: %30s : ", i); OutScr("R.20", u)
-		}
-	case []interface{}:
-		for i, u := range typedValue {
-			OutScr("S.20.?F: %30d : ", i); OutScr("R.20", u)
-		}
-	default:
-		OutScr("S.20.?F:%30s : ", " "); OutScr("R.20", typedValue)
+	//_ = BREAKPOINT 
+	
+	testList := TestList {
+ 		Test{"root"          , nil, Expected{
+			JValue(`{"Map" : {"a" : 0, "b" : 1, "c" : 2, "i0" : 3},"Arr" : ["a", "b", "c", 0, 1, 2]}`),
+			                                                 "root"      , ""     , nil                    }, DTree{}},
+ 		Test{"root.Map"      , nil, Expected{
+		    JValue(`{"a" : 0, "b" : 1, "c" : 2, "i0" : 3}`), "root.Map"  , ""     , nil                    }, DTree{}},
+		Test{"root.Map.a"    , nil, Expected{JValue(`0`)   , "root.Map.a", ""     , nil                    }, DTree{}},
+ 		Test{"root.Map.b"    , nil, Expected{JValue(`1`)   , "root.Map.b", ""     , nil                    }, DTree{}},
+		Test{"root.Map.c"    , nil, Expected{JValue(`2`)   , "root.Map.c", ""     , nil                    }, DTree{}},
+		Test{"root.Map.0"    , nil, Expected{JValue(``)    , "root.Map"  , "0"    , Error(errMap, 0)       }, DTree{}},
+		Test{"root.Map.a.1"  , nil, Expected{JValue(``)    , "root.Map.a", "1"    , Error(errVal,"float64")}, DTree{}},
+		Test{"root.Map.s"    , nil, Expected{JValue(``)    , "root.Map"  , "s"    , Error(errMap,"s")      }, DTree{}},
+		Test{"root.Map.s.1"  , nil, Expected{JValue(``)    , "root.Map"  , "s.1"  , Error(errMap,"s")      }, DTree{}},
+		Test{"root.Arr"      , nil, Expected{
+		    JValue(`["a", "b", "c", 0, 1, 2]`)             , "root.Arr"  , ""     , nil                    }, DTree{}},
+		Test{"root.Arr.0"    , nil, Expected{JValue(`"a"`) , "root.Arr.0", ""     , nil                    }, DTree{}},
+		Test{"root.Arr.1"    , nil, Expected{JValue(`"b"`) , "root.Arr.1", ""     , nil                    }, DTree{}},
+		Test{"root.Arr.2"    , nil, Expected{JValue(`"c"`) , "root.Arr.2", ""     , nil                    }, DTree{}},
+		Test{"root.Arr.3"    , nil, Expected{JValue(`0`)   , "root.Arr.3", ""     , nil                    }, DTree{}},
+		Test{"root.Arr.4"    , nil, Expected{JValue(`1`)   , "root.Arr.4", ""     , nil                    }, DTree{}},
+		Test{"root.Arr.5"    , nil, Expected{JValue(`2`)   , "root.Arr.5", ""     , nil                    }, DTree{}},
+		Test{"root.Arr.0.0"  , nil, Expected{JValue(``)    , "root.Arr.0", "0"    , Error(errVal, "string")}, DTree{}},
+		Test{"root.Arr.6"    , nil, Expected{JValue(``)    , "root.Arr"  , "6"    , Error(errArr, 6)       }, DTree{}},
+		Test{"root.Arr.6.11" , nil, Expected{JValue(``)    , "root.Arr"  , "6.11" , Error(errArr, 6)       }, DTree{}},
 	}
 	
-	OutAll("R.20", "\nEnd of reading of", confName, "\n")
+	TestGet(&testList, &appConf, testLen)
 
-	OutScr("L.00.FgYellow.Bold.?F:appConf.DirName is "); OutScr("R.00", appConf.DirName)
-	OutScr("L.00.FgYellow.Bold.?F:appConf.FileName is "); OutScr("R.00", appConf.FileName)
-	OutScr("B.00.FgYellow.Bold.?F:appConf.Value is:\n"); OutScr("R.00", appConf.Value, "\n")
-
-	indices := Indices{
-/*        ".",
-		"a.1.v.f",
-		"AppName.a", 
-		"AppName.b", 
-		"Database.DirName", 
-		"Database.Config", 
-		"Database.Source", 
-		"Desktop.DirName", 
-		"Desktop.Config", 
-		"Desktop.Source",
-		"Apps.SourceDir",
-		"Apps.ConfPattern",
-		"Apps.ConfFile",
-		"Database.DBName",
-		"Database.ConfDir",
-		"Database.ConfFile",
-		"phpDesktop.DefaultsDir",
-		"phpDesktop.ConfDir",
-		"phpDesktop.ConfFile",
-*/
-
-/**/	{"root"},
-/**/	{"root.Map"},
-/**/	{"root.Map.a"},
-/**/	{"root.Map.b"},
-		{"root.Map.c"},
-		{"root.Map.0"},
-/**/	{"root.Map.a.1"},
-/**/	{"root.Map.s"},
-		{"root.Map.s.15"},
-
-/**/	{"root.Arr"},
-/**/	{"root.Arr.0"},
-/**/	{"root.Arr.1"},
-/**/	{"root.Arr.2"},
-/**/	{"root.Arr.3"},
-/**/	{"root.Arr.4"},
-/**/ 	{"root.Arr.5"},
-/**/	{"root.Arr.0.0"},
-/**/	{"root.Arr.6"},
-/**/	{"root.Arr.6.11"},
-/**/
-	}
-	breakNo := -1
-	finalValues := CollectFinalValues(&indices, &appConf, breakNo)
-	PrintFinalValues(&indices, &finalValues, breakNo)
-	OutScr("R.00")
+	Out("\n")
 	
-	indices = Indices{
-		//{"Map.a", "new map value"},
-		//{"Map.3", "new map value"},
-		//{"Arr.3", []interface{}{nil, nil, "new array value"}},
-		//{"Arr.4", "new array value"},
-		//{"Arr.4.2", "new array value"},
-		//{"", "Labas"},
-		//{"Arr.n.m", "dddd"},
-		//{"Map.n.m", "dddd"},
+	// Preparing list of DTree.Set() tests
+	// []Test{ 
+	//     key, new value(nil), 
+	//     Expected { expected value, expected used path, expected rest path, expected error },
+	//     result
+	// }
+	
+  	testList = TestList {
+		Test{"root.Map.n.m"  , JValue(`"dddd"`), Expected{JValue(`"dddd"`), "root.Map.n.m"  ,"", nil}, DTree{}},
+		Test{"root.Arr.+"    , JValue(`"0000"`), Expected{JValue(`"0000"`), "root.Arr.+"    ,"", nil}, DTree{}},
+		Test{"root.Arr.+.+"  , JValue( `7777` ), Expected{JValue( `7777` ), "root.Arr.+.+"  ,"", nil}, DTree{}},
+		Test{"root.Map.+"    , JValue( `15`   ), Expected{JValue( `15`   ), "root.Map.+"    ,"", nil}, DTree{}},
 	}
 	
-	finalValues = FinalValueMap{}
-	
-//_ = BREAKPOINT
-	finalValues = CollectFinalValues(&indices, &appConf, breakNo)
-	PrintFinalValues(&indices, &finalValues, breakNo)
+	TestSet(&testList, &appConf, testLen)
+
+	Out("\n")
+
+	// Preparing list of DTree.Add() tests
+	// []Test{ 
+	//     key, new value(nil), 
+	//     Expected { expected value, expected used path, expected rest path, expected error },
+	//     result
+	// }
+
+/*   	testList = TestList {
+		Test{"root.Map.n.m"  , JValue(`"cccc"`), Expected{JValue(`"cccc"`), "root.Map.n.m"  ,"", nil}, DTree{}},
+		Test{"root.Map.+"    , JValue( `1555` ), Expected{JValue( `1555` ), "root.Map.+"    ,"", nil}, DTree{}},
+		Test{"root.Map.d"    , JValue( `3`    ), Expected{JValue( `3`    ), "root.Map.d"    ,"", nil}, DTree{}},
+		Test{"root.Arr.+"    , JValue(`"117"` ), Expected{JValue(`"117"` ), "root.Arr.+"    ,"", nil}, DTree{}},
+		Test{"root.Arr.0"    , JValue(`"----"`), Expected{nil             , "root.Arr.0"    ,"", 
+		                                                                  Error(errAlr,"root.Arr.0")}, DTree{}},
+		Test{"root.Arr.0.0"  , JValue(`"----"`), Expected{nil             , "root.Arr.0"    ,"0", 
+		                                                                  Error(errAlr,"root.Arr.0")}, DTree{}},
+		Test{"root.Arr.6.11" , JValue(`"0611"`), Expected{JValue(`"0611"`), "root.Arr.6.11" ,"", nil}, DTree{}},
+	}
 
 _ = BREAKPOINT
-	path := "root.Map.n.m"; newValue := "dddd"
-	OutAll("B.00", "path : ",  path, "newValue : ", newValue)
-	result := appConf.Set(path, newValue)
-	OutAll("B.00", result.RestPath, result.Value, result.Error)
-	
-	path = "root.Arr.+"; newValue = "0000"
-	OutAll("B.00", "path : ",  path, "newValue : ", newValue)
-	result = appConf.Set(path, newValue)
-	OutAll("B.00", result.RestPath, result.Value, result.Error)
 
-	path = "root.Arr.+.+"; newValue = "7777"
-	OutAll("B.00", "path : ",  path, "newValue : ", newValue)
-	result = appConf.Set(path, newValue)
-	OutAll("B.00", result.RestPath, result.Value, result.Error)
-
-	path = "root.Map.+"; newValue = "0000"
-	OutAll("B.00", "path : ",  path, "newValue : ", newValue)
-	result = appConf.Set(path, newValue)
-	OutAll("B.00", result.RestPath, result.Value, result.Error)
-
-	OutScr("B.00.Out.FgYellow.Bold.?F:appConf.Value is: "); OutScr("B.00.?F: %v", appConf.Value)
+	TestAdd(&testList, &appConf, testLen)
+ */
+	Out("FY.B?:appConf.Value is: "); Out("?: %v\n\n", appConf.Value)
  
-	OutAll("B.00.Out.FgCyan.Bold.?F: XML test\n-----------")
+	Out("FHM.B?: XML test\n-----------\n\n")
  
-	var xmlConf dtree.XMLHandler
-	if result.Error = xmlConf.ReadFile(xmlName); result.Error != nil {
-		panic(result.Error)
+	var xmlConf XMLHandler
+	if err = xmlConf.ReadFile(xmlName); err != nil {
+		panic(err)
 	}
-	OutAll("R.00.?F: File \"%v\" exists and was read.\n", xmlConf.FileName)
+	Out("?: File \"%v\" exists and was read.\n\n", xmlConf.FileName)
 	
-	if result.Error = xmlConf.Decode(); result.Error != nil {
-		panic(result.Error)
-	}
-	OutAll("R.00.?F: A structure with data tree of \"%v\" file was successfully created.\n", xmlConf.FileName)
-	OutScr("R.00.Out.FgYellow.Bold.?F:xmlConf.Value is: "); OutScr("B.00.?F: %v", xmlConf.Value)
-
+	if err = xmlConf.Decode(); err != nil {
+		panic(err)
+	} 
+	Out("?: A structure with data tree of \"%v\" file was successfully created.\n\n", xmlConf.FileName)
+	Out("FY.B.?:xmlConf.Value is: "); Out("?: %v\n", xmlConf.Value)
  
-	OutDeb("EndProg", "_Settings")
+ 
+	Debug("EndProg", runFileName)
 }
  
