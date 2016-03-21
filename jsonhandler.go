@@ -30,7 +30,7 @@ func (handler *JsonHandler) Encode() (err error) {
 	return
 }
 
-func (handler *JsonHandler) ToValue(jsonString string) (result interface{}){
+func (handler *JsonHandler) NewValue(jsonString string) (result interface{}){
 	err := json.Unmarshal([]byte(jsonString), &result)
 	if err != nil && jsonString != "" {
 		panic(err)
