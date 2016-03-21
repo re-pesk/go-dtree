@@ -85,7 +85,6 @@ result = tree.Set("NewArr.2.1", tree.NewValue(`"new_value"`))
 result = tree.Set("NewArr.2.+", tree.NewValue(`"plus_value"`))
 
 /* Output: 
- tree.Get("NewArr.2.+", tree.NewValue(`"plus_value"`)):
  result.Value: plus_value
  result.UsedPath: "NewArr.2.+"
  result.RestPath: ""

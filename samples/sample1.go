@@ -94,7 +94,7 @@ func main(){
 `, result.Value, result.UsedPath, result.RestPath, result.Error)
 
 	/* Output: 
-	 tree.Get("Other.d", tree.NewValue(`"abc"`)):
+	 tree.Set("Other.d", tree.NewValue(`"abc"`)):
 	 result.Value: abc
 	 result.UsedPath: "Other.d"
 	 result.RestPath: ""
@@ -112,7 +112,7 @@ func main(){
 `, result.Value, result.UsedPath, result.RestPath, result.Error)
 
 	/* Output: 
-	 tree.Get("NewArr.2.1", tree.NewValue(`"new_value"`)):
+	 tree.Set("NewArr.2.1", tree.NewValue(`"new_value"`)):
 	 result.Value: new_value
 	 result.UsedPath: "NewArr.2.1"
 	 result.RestPath: ""
@@ -130,7 +130,7 @@ func main(){
 `, result.Value, result.UsedPath, result.RestPath, result.Error)
 
 	/* Output: 
-	 tree.Get("NewArr.2.+", tree.NewValue(`"plus_value"`)):
+	 tree.Set("NewArr.2.+", tree.NewValue(`"plus_value"`)):
 	 result.Value: plus_value
 	 result.UsedPath: "NewArr.2.+"
 	 result.RestPath: ""
