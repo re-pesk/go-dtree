@@ -5,7 +5,7 @@ Tool for working with semi-structured data like json or xml
 ### Usage
 
 Reading json file:
-```
+```go
 fmt.Println("\nReading json file:\n")
 var tree dtree.JsonHandler
 if err := tree.ReadFile("start.conf"); err != nil {
@@ -28,7 +28,7 @@ if err := tree.Decode(); err == nil {
 ```
 
 Decoding string:
-```
+```go
 fmt.Println("\nReading json string:\n")
 tree.Content = []byte(`{"Other" : {"a" : 0, "b" : 1, "c" : 2, "i0" : 3}}`)
 if err := tree.Decode(); err == nil {
@@ -41,7 +41,7 @@ if err := tree.Decode(); err == nil {
 ```	
 
 Getting value, used path, remained path and error when path is right:
-```
+```go
 result := tree.Get("Other.a")
 
 /* Result: 
@@ -52,7 +52,7 @@ result := tree.Get("Other.a")
 */
 ```
 Getting value, used path, remained path and error when path is wrong:
-```
+```go
 result = tree.Get("Other.d")
 
 /* Result: 
@@ -63,7 +63,7 @@ result = tree.Get("Other.d")
 */
 ```
 Setting values:
-```
+```go
 result = tree.Set("Other.d", tree.NewValue(`"abc"`))
 
 /* Result: 
@@ -84,7 +84,7 @@ result = tree.Set("NewArr.2.1", tree.NewValue(`"new_value"`))
 	
 result = tree.Set("NewArr.2.+", tree.NewValue(`"plus_value"`))
 
-/* Output: 
+/* Result: 
  result.Value: plus_value
  result.UsedPath: "NewArr.2.+"
  result.RestPath: ""
@@ -92,7 +92,7 @@ result = tree.Set("NewArr.2.+", tree.NewValue(`"plus_value"`))
 */
 ```
 Final tree:
-```
+```go
 fmt.Printf(`
  Final tree.Value: "%v"%v`, tree.Value, "\n" )
 
