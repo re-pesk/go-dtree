@@ -87,5 +87,5 @@ result.Error: %v
 Final tree:
 ```
 fmt.Printf(`
-tree.Value: "%v"`, tree.Value )
+tree.Value: "%v\n"`, tree.Value )
 ```

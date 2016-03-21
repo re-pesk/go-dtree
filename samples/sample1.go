@@ -32,9 +32,9 @@ func main(){
 
 	fmt.Printf(`
  tree.Get("Other.a"):
- result.Value: "%v",
- result.Used path: "%v",
- result.Remaining path: "%v",
+ result.Value: "%v"
+ result.Used path: "%v"
+ result.Remaining path: "%v"
  result.Error: %v
 `, result.Value, result.UsedPath, result.RestPath, result.Error)
 
@@ -45,9 +45,9 @@ func main(){
 
 	fmt.Printf(`
  tree.Get("Other.d"):
- result.Value: "%v",
- result.Used path: "%v",
- result.Remaining path: "%v",
+ result.Value: "%v"
+ result.Used path: "%v"
+ result.Remaining path: "%v"
  result.Error: %v
 `, result.Value, result.UsedPath, result.RestPath, result.Error)
 
@@ -55,36 +55,36 @@ func main(){
 
 	result = tree.Set("Other.d", tree.NewValue(`"abc"`))
 
-	fmt.Print("\n tree.Set(\"Map.d\", tree.NewValue(`\"abc\"`))")
+	fmt.Print("\n tree.Set(\"Other.d\", tree.NewValue(`\"abc\"`))")
 	fmt.Printf(`
- result.Value: "%v",
- result.Used path: "%v",
- result.Remaining path: "%v",
+ result.Value: "%v"
+ result.Used path: "%v"
+ result.Remaining path: "%v"
  result.Error: %v
 `, result.Value, result.UsedPath, result.RestPath, result.Error)
 		
-	result = tree.Set("Map.6.1", tree.NewValue(`"new value"`))
+	result = tree.Set("NewMap.2.1", tree.NewValue(`"new_value"`))
 
-	fmt.Print("\n tree.Set(\"Map.6.1\", tree.NewValue(`\"new value\"`))")
+	fmt.Print("\n tree.Set(\"NewMap.2.1\", tree.NewValue(`\"new_value\"`))")
 	fmt.Printf(`
- result.Value: "%v",
- result.Used path: "%v",
- result.Remaining path: "%v",
+ result.Value: "%v"
+ result.Used path: "%v"
+ result.Remaining path: "%v"
  result.Error: %v
 `, result.Value, result.UsedPath, result.RestPath, result.Error)
 		
-	result = tree.Set("Map.6.+", tree.NewValue(`"plus_value"`))
+	result = tree.Set("NewMap.2.+", tree.NewValue(`"plus_value"`))
 
-	fmt.Print("\n tree.Set(\"Map.6.+\", tree.NewValue(`\"plus_value\"`))")
+	fmt.Print("\n tree.Set(\"NewMap.2.+\", tree.NewValue(`\"plus_value\"`))")
 	fmt.Printf(`
- result.Value: "%v",
- result.Used path: "%v",
- result.Remaining path: "%v",
+ result.Value: "%v"
+ result.Used path: "%v"
+ result.Remaining path: "%v"
  result.Error: %v
 `, result.Value, result.UsedPath, result.RestPath, result.Error)
 
 	fmt.Printf(`
- tree.Value: "%v"`, tree.Value )
+ tree.Value: "%v"%v`, tree.Value, "\n" )
 
 }
 
