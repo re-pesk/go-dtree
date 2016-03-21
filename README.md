@@ -44,16 +44,7 @@ Getting value, used path, remained path and error when path is right:
 ```
 result := tree.Get("Other.a")
 
-fmt.Printf(`
-tree.Get("Other.a"):
-result.Value: %v
-result.UsedPath: "%v"
-result.RestPath: "%v"
-result.Error: %v
-`, result.Value, result.UsedPath, result.RestPath, result.Error)
-
-/* Output: 
- tree.Get("Other.a"):
+/* Result: 
  result.Value: 0
  result.UsedPath: "Other.a"
  result.RestPath: ""
@@ -62,20 +53,9 @@ result.Error: %v
 ```
 Getting value, used path, remained path and error when path is wrong:
 ```
-fmt.Println("\nGetting value when path is wrong:\n")
-
 result = tree.Get("Other.d")
 
-fmt.Printf(`
-tree.Get("Other.d"):
-result.Value: %v
-result.UsedPath: "%v"
-result.RestPath: "%v"
-result.Error: %v
-`, result.Value, result.UsedPath, result.RestPath, result.Error)
-
-/* Output: 
- tree.Get("Other.d"):
+/* Result: 
  result.Value: <nil>
  result.UsedPath: "Other"
  result.RestPath: "d"
@@ -86,16 +66,7 @@ Setting values:
 ```
 result = tree.Set("Other.d", tree.NewValue(`"abc"`))
 
-fmt.Print("\n tree.Set(\"Other.d\", tree.NewValue(`\"abc\"`))")
-fmt.Printf(`
-result.Value: %v
-result.UsedPath: "%v"
-result.RestPath: "%v"
-result.Error: %v
-`, result.Value, result.UsedPath, result.RestPath, result.Error)
-
-/* Output: 
- tree.Get("Other.d", tree.NewValue(`"abc"`)):
+/* Result: 
  result.Value: abc
  result.UsedPath: "Other.d"
  result.RestPath: ""
@@ -104,16 +75,7 @@ result.Error: %v
 
 result = tree.Set("NewArr.2.1", tree.NewValue(`"new_value"`))
 
-fmt.Print("\n tree.Set(\"NewArr.2.1\", tree.NewValue(`\"new_value\"`))")
-fmt.Printf(`
-result.Value: %v
-result.UsedPath: "%v"
-result.RestPath: "%v"
-result.Error: %v
-`, result.Value, result.UsedPath, result.RestPath, result.Error)
-
-/* Output: 
- tree.Get("NewArr.2.1", tree.NewValue(`"new_value"`)):
+/* Result: 
  result.Value: new_value
  result.UsedPath: "NewArr.2.1"
  result.RestPath: ""
@@ -121,14 +83,6 @@ result.Error: %v
 */
 	
 result = tree.Set("NewArr.2.+", tree.NewValue(`"plus_value"`))
-
-fmt.Print("\n tree.Set(\"NewArr.2.+\", tree.NewValue(`\"plus_value\"`))")
-fmt.Printf(`
-result.Value: %v
-result.UsedPath: "%v"
-result.RestPath: "%v"
-result.Error: %v
-`, result.Value, result.UsedPath, result.RestPath, result.Error)
 
 /* Output: 
  tree.Get("NewArr.2.+", tree.NewValue(`"plus_value"`)):
