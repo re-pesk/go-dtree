@@ -241,8 +241,8 @@ func main(){
 	
 	testList := TestList {
  		Test{"root"          , nil, Expected{
-			JValue(`{"Map" : {"a" : 0, "b" : 1, "c" : 2, "i0" : 3},"Arr" : ["a", "b", "c", 0, 1, 2]}`),
-			                                                 "root"      , ""     , nil                    }, DTree{}},
+        JValue(`{"Map" : {"a" : 0, "b" : 1, "c" : 2, "i0" : 3},"Arr" : ["a", "b", "c", 0, 1, 2]}`),
+    		                                                 "root"      , ""     , nil                    }, DTree{}},
  		Test{"root.Map"      , nil, Expected{
 		    JValue(`{"a" : 0, "b" : 1, "c" : 2, "i0" : 3}`), "root.Map"  , ""     , nil                    }, DTree{}},
 		Test{"root.Map.a"    , nil, Expected{JValue(`0`)   , "root.Map.a", ""     , nil                    }, DTree{}},
@@ -253,7 +253,7 @@ func main(){
 		Test{"root.Map.s"    , nil, Expected{JValue(``)    , "root.Map"  , "s"    , Error(errMap,"s")      }, DTree{}},
 		Test{"root.Map.s.1"  , nil, Expected{JValue(``)    , "root.Map"  , "s.1"  , Error(errMap,"s")      }, DTree{}},
 		Test{"root.Arr"      , nil, Expected{
-		    JValue(`["a", "b", "c", 0, 1, 2]`)             , "root.Arr"  , ""     , nil                    }, DTree{}},
+        JValue(`["a", "b", "c", 0, 1, 2]`)             , "root.Arr"  , ""     , nil                    }, DTree{}},
 		Test{"root.Arr.0"    , nil, Expected{JValue(`"a"`) , "root.Arr.0", ""     , nil                    }, DTree{}},
 		Test{"root.Arr.1"    , nil, Expected{JValue(`"b"`) , "root.Arr.1", ""     , nil                    }, DTree{}},
 		Test{"root.Arr.2"    , nil, Expected{JValue(`"c"`) , "root.Arr.2", ""     , nil                    }, DTree{}},
