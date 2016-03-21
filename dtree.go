@@ -73,7 +73,11 @@ func (tree *DTree) Set(path string, newValue interface{}) (result DTree){
 	return
 }
 
-func (tree *DTree) Update(path string, newValue interface{}) (result DTree){
+/* func (tree *DTree) Delete(path string) (result DTree){
+	return
+}
+
+func (tree *DTree) Replace(path string, newValue interface{}) (result DTree){
 	path = strings.Trim(path, " ")
 	tmp := tree.Get(path)
 	if tmp.Error == nil {
@@ -94,4 +98,4 @@ func (tree *DTree) Add(path string, newValue interface{}) (result DTree){
 		result.Error = fmt.Errorf("Element with key \"%v\" already exists!", path)
 	}
 	return
-}
+} */
