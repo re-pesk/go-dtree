@@ -138,10 +138,11 @@ func main(){
 	*/
 
 	fmt.Printf(`
- Final tree.Value: "%v"%v`, tree.Value, "\n" )
+ Final tree.Value: "%v"
+`, tree.Value, "\n" )
 
- /* Output: 
-	 tree.Value: map[Other:map[a:0 b:1 c:2 i0:3 d:abc] NewArr:[<nil> <nil> [<nil> new_value plus_value]]]
+  /* Output: 
+	 Final tree.Value: map[Other:map[a:0 b:1 c:2 i0:3 d:abc] NewArr:[<nil> <nil> [<nil> new_value plus_value]]]
 	*/
 }
 

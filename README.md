@@ -94,9 +94,10 @@ result = tree.Set("NewArr.2.+", tree.NewValue(`"plus_value"`))
 Final tree:
 ```go
 fmt.Printf(`
- Final tree.Value: "%v"%v`, tree.Value, "\n" )
+ Final tree.Value: "%v"
+`, tree.Value )
 
 /* Output: 
- tree.Value: map[Other:map[a:0 b:1 c:2 i0:3 d:abc] NewArr:[<nil> <nil> [<nil> new_value plus_value]]]
+ Final tree.Value: map[Other:map[a:0 b:1 c:2 i0:3 d:abc] NewArr:[<nil> <nil> [<nil> new_value plus_value]]]
 */
 ```
