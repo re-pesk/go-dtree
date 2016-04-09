@@ -1,7 +1,7 @@
 package main
 
 import (
-	"github.com/re-pe/dtree"
+	"github.com/re-pe/dtree-go"
 	"fmt"
 )
 
@@ -139,7 +139,7 @@ func main(){
 
 	fmt.Printf(`
  Final tree.Value: "%v"
-`, tree.Value, "\n" )
+`, tree.Value )
 
   /* Output: 
 	 Final tree.Value: map[Other:map[a:0 b:1 c:2 i0:3 d:abc] NewArr:[<nil> <nil> [<nil> new_value plus_value]]]

@@ -1,7 +1,7 @@
 package main
 
 import (
-	. "github.com/re-pe/dtree"
+	. "github.com/re-pe/dtree-go"
 	. "github.com/re-pe/output"
 	"encoding/json"
 	"fmt"
@@ -70,7 +70,7 @@ func JValue(jsonString string) (result Value){
 }
 
 func Error(args ...interface{}) (err error){
-	err = fmt.Errorf(Format(args...))
+	err = fmt.Errorf(Format(args...).Text)
 	return
 }
 
