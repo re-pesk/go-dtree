@@ -2,7 +2,7 @@ package main
 
 import (
 	. "github.com/re-pe/dtree-go"
-	. "github.com/re-pe/output"
+	. "github.com/re-pe/output-go"
 	"encoding/json"
 	"fmt"
 	"log"
@@ -98,7 +98,7 @@ func OutputTest(testList *TestList, testLen int){
 		if testLen > -1 && no >= testLen {
 			break
 		}
-		Out("FHY.B?:%24s = \"%v\"\n", Format("?:%3d. %s", no, "key"), test.Key)
+		Out("FHY.B?:%24s = \"%v\"\n", Format("?:%3d. %s", no, "key").Text, test.Key)
 		Out("\n")
 		Out("?:%24s = %v\n"    , "new value"         , test.NewValue)
 		Out("\n")
