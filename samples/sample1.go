@@ -1,7 +1,7 @@
 package main
 
 import (
-	"github.com/re-pe/dtree-go"
+	"github.com/re-pe/go-dtree"
 	"fmt"
 )
 
