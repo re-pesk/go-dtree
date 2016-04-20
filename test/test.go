@@ -1,8 +1,8 @@
 package main
 
 import (
-	. "github.com/re-pe/dtree-go"
-	. "github.com/re-pe/output-go"
+	. "github.com/re-pe/go/dtree"
+	. "github.com/re-pe/go/output"
 	"encoding/json"
 	"fmt"
 	"log"
